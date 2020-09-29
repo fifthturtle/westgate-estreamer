@@ -1,0 +1,40 @@
+<html>
+  <head>
+    <title>Fountain Control</title>
+  </head>
+  <body>
+    <script>
+      async function playAmbient() {
+        const url = `http://${window.location.hostname}:5953/api/playAmbient`;
+        const data = await fetch(url);
+        console.log(await data.json());
+      }
+
+      async function playBigShow() {
+        const url = `http://${window.location.hostname}:5953/api/playBigShow`;
+        const data = await fetch(url);
+        console.log(await data.json());
+      }
+
+      async function stopAll() {
+        const url = `http://${window.location.hostname}:5953/api/stopAll`;
+        const data = await fetch(url);
+        console.log(await data.json());
+      }
+
+      async function getStatus() {
+        const url = `http://${window.location.hostname}:5953/api/status`;
+        const data = await fetch(url);
+        document.getElementById("status").innerHTML = (
+          await data.json()
+        ).status;
+      }
+
+      setInterval(getStatus, 1000);
+    </script>
+    <p>Current Status: <span id="status">Nothing</span></p>
+    <button onClick="playAmbient()">Play Ambient</button>
+    <button onClick="playBigShow()">Play Big Show</button>
+    <button onClick="stopAll()">Stop All</button>
+  </body>
+</html>

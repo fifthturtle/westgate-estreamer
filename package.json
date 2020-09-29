@@ -18,6 +18,7 @@
   "homepage": "https://github.com/fifthturtle/westgate-estreamer#readme",
   "dependencies": {
     "@hapi/hapi": "^19.2.0",
+    "@hapi/inert": "^6.0.3",
     "fs-extra": "^9.0.1",
     "serialport": "^9.0.0"
   }
