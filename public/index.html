@@ -3,7 +3,27 @@
     <title>Fountain Control</title>
   </head>
   <body>
+    <div id="demo">Click to get Geo Location</div>
+    <button onClick="getLocation()">Get Location</button>
+    <p>Current Status: <span id="status">Nothing</span></p>
+    <button onClick="playAmbient()">Play Ambient</button>
+    <button onClick="playBigShow()">Play Big Show</button>
+    <button onClick="stopAll()">Stop All</button>
     <script>
+      let x = document.getElementById("demo");
+      function getLocation() {
+        if (navigator.geolocation) {
+          navigator.geolocation.getCurrentPosition(showPosition);
+        } else {
+          x.innerHTML = "Geolocation is not supported by this browser.";
+        }
+      }
+
+      function showPosition(position) {
+        x.innerHTML =
+          position.coords.latitude + "," + position.coords.longitude;
+      }
+
       async function playAmbient() {
         const url = `http://${window.location.hostname}:5953/api/playAmbient`;
         const data = await fetch(url);
@@ -32,9 +52,5 @@
 
       setInterval(getStatus, 1000);
     </script>
-    <p>Current Status: <span id="status">Nothing</span></p>
-    <button onClick="playAmbient()">Play Ambient</button>
-    <button onClick="playBigShow()">Play Big Show</button>
-    <button onClick="stopAll()">Stop All</button>
   </body>
 </html>
