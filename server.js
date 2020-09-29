@@ -98,12 +98,35 @@ const init = async () => {
 
   server.route({
     method: "GET",
+    path: "/api/disable",
+    config: {
+      cors,
+    },
+    handler: async (request, h) => {
+      control.disableFountain(parseInt(request.query.d));
+      return control.getStatusDescription();
+    },
+  });
+
+  server.route({
+    method: "GET",
     path: "/api/status",
     config: {
       cors,
     },
     handler: async (request, h) => {
       return control.getStatusDescription();
+    },
+  });
+
+  server.route({
+    method: "GET",
+    path: "/images/{img}",
+    config: {
+      cors,
+    },
+    handler: async (request, h) => {
+      return h.file(`images/${request.params.img}.png`);
     },
   });
 

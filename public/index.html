@@ -2,52 +2,140 @@
   <head>
     <title>Fountain Control</title>
   </head>
-  <body>
-    <div id="demo">Click to get Geo Location</div>
-    <button onClick="getLocation()">Get Location</button>
-    <p>Current Status: <span id="status">Nothing</span></p>
-    <button onClick="playAmbient()">Play Ambient</button>
-    <button onClick="playBigShow()">Play Big Show</button>
-    <button onClick="stopAll()">Stop All</button>
-    <script>
-      let x = document.getElementById("demo");
-      function getLocation() {
-        if (navigator.geolocation) {
-          navigator.geolocation.getCurrentPosition(showPosition);
-        } else {
-          x.innerHTML = "Geolocation is not supported by this browser.";
-        }
-      }
+  <style>
+    img {
+      float: right;
+      max-width: 60px;
+      max-height: 60px;
+    }
 
-      function showPosition(position) {
-        x.innerHTML =
-          position.coords.latitude + "," + position.coords.longitude;
-      }
+    #wrapper {
+      max-width: 600px;
+      margin: 0 auto;
+      background-color: white;
+      height: 100vh;
+    }
+
+    #playStatus {
+      padding: 2% 10%;
+      margin-bottom: 20px;
+    }
+
+    #control-buttons {
+      border-bottom: 2px solid black;
+      border-top: 2px solid black;
+      text-align: center;
+      padding: 2% 10%;
+    }
+
+    #control-buttons button {
+      width: 110px;
+    }
+
+    #disable {
+      padding: 2% 10%;
+      text-align: center;
+    }
+
+    body {
+      background-color: black;
+      padding: 0;
+      margin: 0;
+    }
+  </style>
+  <body>
+    <div id="wrapper">
+      <div id="playStatus">
+        <img id="night" src="" />
+        <span id="time"></span><br />
+        Currently Playing: <span id="status">Nothing</span><br />
+        Sunset: <span id="sunset"></span>
+      </div>
+      <div id="control-buttons">
+        <button onClick="playAmbient()">Play Ambient</button>
+        <button onClick="playBigShow()">Play Big Show</button>
+        <button onClick="stopAll()">Stop All</button>
+      </div>
+      <div id="disable">
+        <span id="disableText"></span><br />
+        <button id="disableButton" onClick="disableFountain()"></button>
+      </div>
+    </div>
+    <script>
+      let status = {};
 
       async function playAmbient() {
+        if (status.disabled) {
+          const msg =
+            "The Fountain is disabled and cannot play Ambient.\r\nWould you like to enable the fountain and start Ambient?";
+          const res = confirm(msg);
+          if (res) {
+            disableFountain();
+            setTimeout(playAmbient, 3000);
+          }
+          return;
+        }
         const url = `http://${window.location.hostname}:5953/api/playAmbient`;
         const data = await fetch(url);
-        console.log(await data.json());
+        update(await data.json());
       }
 
       async function playBigShow() {
+        if (status.disabled) {
+          const msg =
+            "The Fountain is disabled and cannot play Big Show.\r\nWould you like to enable the fountain and start Big Show?";
+          const res = confirm(msg);
+          if (res) {
+            disableFountain();
+            setTimeout(playBigShow, 3000);
+          }
+          return;
+        }
         const url = `http://${window.location.hostname}:5953/api/playBigShow`;
         const data = await fetch(url);
-        console.log(await data.json());
+        update(await data.json());
       }
 
       async function stopAll() {
         const url = `http://${window.location.hostname}:5953/api/stopAll`;
         const data = await fetch(url);
-        console.log(await data.json());
+        update(await data.json());
       }
 
       async function getStatus() {
         const url = `http://${window.location.hostname}:5953/api/status`;
+        status = await (await fetch(url)).json();
+        update();
+      }
+
+      function update(data = false) {
+        if (!!data) status = data;
+        document.getElementById("status").innerHTML = status.status;
+        document.getElementById("time").innerHTML = status.time.display;
+        document.getElementById("sunset").innerHTML = status.sunset.display;
+        document.getElementById("disableText").innerHTML = status.disabled
+          ? "Fountain is Disabled"
+          : "Fountain is Enabled";
+        document.getElementById("disableButton").innerHTML = status.disabled
+          ? "Enable Fountain"
+          : "Disable Fountain";
+        document.getElementById("night").src = `images/${
+          status.night ? "moon" : "sun"
+        }`;
+      }
+
+      async function disableFountain() {
+        if (!status.disabled) {
+          const msg =
+            "Are you sure you want to disable the fountain?\r\nThis will stop all active shows.";
+          const res = confirm(msg);
+          if (!res) return;
+        }
+        const url = `http://${window.location.hostname}:5953/api/disable?d=${
+          status.disabled ? 0 : 1
+        }`;
         const data = await fetch(url);
-        document.getElementById("status").innerHTML = (
-          await data.json()
-        ).status;
+        update(await data.json());
       }
 
       setInterval(getStatus, 1000);
