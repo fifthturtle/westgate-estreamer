@@ -9,10 +9,15 @@
       max-height: 200px;
     }
 
-    #wrapper {
+    #wrapper, #login {
       width: 100%;
       background-color: white;
       height: 100vh;
+    }
+
+    #login {
+      margin:auto;
+      text-align: center;
     }
 
     #playStatus {
@@ -47,9 +52,34 @@
     button {
       font-size: 80%;
     }
+
+    .hidden {
+      display: none;
+    }
+
+    #message {
+      color:red;
+    }
   </style>
+  <script>
+    function login() {
+        let password = document.getElementById('password').value;
+        if (password === 'W3stg@te1') {
+          document.getElementById('login').classList.add('hidden')
+          document.getElementById('wrapper').classList.remove('hidden')
+        } else {
+          document.getElementById('message').innerHTML='The password you entered is incorrect.';
+        }
+        document.getElementById('password').value = '';
+      }
+  </script>
   <body>
-    <div id="wrapper">
+    <div id="login">
+      <input type="password" id="password" size="20" maxlength="20" /><br />
+      <button onclick="login()">Login</button>
+      <div id="message"></div>
+    </div>
+    <div id="wrapper" class="hidden">
       <div id="playStatus">
         <img id="night" src="" />
         <span id="time"></span><br />
